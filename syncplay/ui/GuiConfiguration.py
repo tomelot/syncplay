@@ -11,16 +11,23 @@ from syncplay.players.playerFactory import PlayerFactory
 from syncplay.utils import isBSD, isLinux, isMacOS, isWindows
 from syncplay.utils import resourcespath, posixresourcespath
 
-from syncplay.vendor.Qt import QtCore, QtWidgets, QtGui, __binding__, IsPySide, IsPySide2
-from syncplay.vendor.Qt.QtCore import Qt, QSettings, QCoreApplication, QSize, QPoint, QUrl, QLine, QEventLoop, Signal
-from syncplay.vendor.Qt.QtWidgets import QApplication, QLineEdit, QLabel, QCheckBox, QButtonGroup, QRadioButton, QDoubleSpinBox, QPlainTextEdit
-from syncplay.vendor.Qt.QtGui import QCursor, QIcon, QImage, QDesktopServices
+from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6.QtCore import Qt, QSettings, QCoreApplication, QSize, QPoint, QUrl, QLine, QEventLoop, Signal
+from PySide6.QtWidgets import QApplication, QLineEdit, QLabel, QCheckBox, QButtonGroup, QRadioButton, QDoubleSpinBox, QPlainTextEdit
+from PySide6.QtGui import QCursor, QIcon, QImage, QDesktopServices
+
+IsPySide = False
+IsPySide2 = True
+__binding__ = 'PySide6'
+__binding_version__ = '6.0.0'
+__qt_version__ = '6.0.0'
+
 if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
 if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 if IsPySide2:
-    from PySide2.QtCore import QStandardPaths
+    from PySide6.QtCore import QStandardPaths
 
 
 class GuiConfiguration:

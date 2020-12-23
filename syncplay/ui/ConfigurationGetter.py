@@ -513,27 +513,25 @@ class ConfigurationGetter(object):
             sys.exit()
         self._overrideConfigWithArgs(args)
         if not self._config['noGui']:
-            try:
-                from syncplay.vendor.Qt import QtWidgets, IsPySide, IsPySide2
-                from syncplay.vendor.Qt.QtCore import QCoreApplication
-                from syncplay.vendor import qt5reactor
-                if not (IsPySide2 or IsPySide):
-                    raise ImportError
-                if QCoreApplication.instance() is None:
-                    self.app = QtWidgets.QApplication(sys.argv)
-                qt5reactor.install()
-                if isMacOS():
-                    import appnope
-                    appnope.nope()
-            except ImportError:
-                try:
-                    from twisted.trial import unittest
-                except Exception as e:
-                    print(e)
-                    print(getMessage("unable-import-twisted-error"))
-                    sys.exit()
-                print(getMessage("unable-import-gui-error"))
-                self._config['noGui'] = True
+            #try:
+            from PySide6 import QtWidgets
+            from PySide6.QtCore import QCoreApplication
+            from syncplay.vendor import qt6reactor
+            if QCoreApplication.instance() is None:
+                self.app = QtWidgets.QApplication(sys.argv)
+            qt6reactor.install()
+            if isMacOS():
+                import appnope
+                appnope.nope()
+            # except ImportError:
+            #     try:
+            #         from twisted.trial import unittest
+            #     except Exception as e:
+            #         print(e)
+            #         print(getMessage("unable-import-twisted-error"))
+            #         sys.exit()
+            #     print(getMessage("unable-import-gui-error"))
+            #     self._config['noGui'] = True
         if self._config['file'] and self._config['file'][:2] == "--":
             self._config['playerArgs'].insert(0, self._config['file'])
             self._config['file'] = None

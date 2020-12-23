@@ -18,9 +18,16 @@ from syncplay.ui.consoleUI import ConsoleUI
 from syncplay.utils import resourcespath
 from syncplay.utils import isLinux, isWindows, isMacOS
 from syncplay.utils import formatTime, sameFilename, sameFilesize, sameFileduration, RoomPasswordProvider, formatSize, isURL
-from syncplay.vendor import Qt
-from syncplay.vendor.Qt import QtCore, QtWidgets, QtGui, __binding__, __binding_version__, __qt_version__, IsPySide, IsPySide2
-from syncplay.vendor.Qt.QtCore import Qt, QSettings, QSize, QPoint, QUrl, QLine, QDateTime
+from PySide6 import QtCore, QtWidgets, QtGui
+
+IsPySide = False
+IsPySide2 = True
+__binding__ = 'PySide6'
+__binding_version__ = '6.0.0'
+__qt_version__ = '6.0.0'
+
+from PySide6.QtCore import Qt, QSettings, QSize, QPoint, QUrl, QLine, QDateTime
+
 applyDPIScaling = True
 if isLinux():
     applyDPIScaling = False
@@ -31,7 +38,7 @@ if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
 if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, applyDPIScaling)
 if IsPySide2:
-    from PySide2.QtCore import QStandardPaths
+    from PySide6.QtCore import QStandardPaths
 if isMacOS() and IsPySide:
     from Foundation import NSURL
     from Cocoa import NSString, NSUTF8StringEncoding
