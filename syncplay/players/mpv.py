@@ -10,7 +10,7 @@ import ast
 from syncplay import constants
 from syncplay.messages import getMessage
 from syncplay.players.basePlayer import BasePlayer
-from syncplay.utils import isURL, findResourcePath
+from syncplay.utils import isURL, findResourcePath, getResourcesPath
 from syncplay.utils import isMacOS, isWindows, isASCII
 from syncplay.vendor.python_mpv_jsonipc.python_mpv_jsonipc import MPV
 
@@ -589,17 +589,23 @@ class MpvPlayer(BasePlayer):
             # On macOS, youtube-dl requires system python to run. Set the environment
             # to allow that version of python to be executed in the mpv subprocess.
             if isMacOS():
+                # try:
+                #     pythonLibs = subprocess.check_output(['/usr/bin/python', '-E', '-c',
+                #                                           'import sys; print(sys.path)'],
+                #                                           text=True, env=dict())
+                #     pythonLibs = ast.literal_eval(pythonLibs)
+                #     pythonPath = ':'.join(pythonLibs[1:])
+                # except:
+                #     pythonPath = None
+                # if pythonPath is not None:
+                #     env['PATH'] = '/usr/bin:/usr/local/bin'
+                #     env['PYTHONPATH'] = pythonPath
                 try:
-                    pythonLibs = subprocess.check_output(['/usr/bin/python', '-E', '-c',
-                                                          'import sys; print(sys.path)'],
-                                                          text=True, env=dict())
-                    pythonLibs = ast.literal_eval(pythonLibs)
-                    pythonPath = ':'.join(pythonLibs[1:])
+                    ytdl_path = subprocess.check_output(['which', 'youtube-dl'], text=True, env=env).rstrip('\n')
+                    env['YTDL'] = ytdl_path
+                    env['PATH'] = getResourcesPath() + ':' + env['PATH']
                 except:
-                    pythonPath = None
-                if pythonPath is not None:
-                    env['PATH'] = '/usr/bin:/usr/local/bin'
-                    env['PYTHONPATH'] = pythonPath
+                    print('WARNING: could not find youtube-dl on the target system.')
             try:
                 socket = self.mpv_arguments.get('input-ipc-server')
                 self.mpvpipe = self.playerIPCHandler(mpv_location=self.playerPath, ipc_socket=socket, loglevel="info", log_handler=self.__playerController.mpv_log_handler, quit_callback=self.stop_client, env=env, **self.mpv_arguments)
