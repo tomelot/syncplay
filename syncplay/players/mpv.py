@@ -590,7 +590,16 @@ class MpvPlayer(BasePlayer):
             # to allow that version of python to be executed in the mpv subprocess.
             if isMacOS():
                 try:
-                    pythonLibs = subprocess.check_output(['/usr/bin/python', '-E', '-c',
+                    ytdl_path = subprocess.check_output(['which', 'youtube-dl'], text=True, env=env).rstrip('\n')
+                    with open(ytdl_path) as f:
+                        ytdl_shebang = f.readline()
+                    ytdl_python = ytdl_shebang.lstrip('!#').rstrip('\n')
+                    if '/usr/bin/env' in ytdl_python:
+                        python_name = ytdl_python.split(' ')[1]
+                        python_executable = subprocess.check_output(['which', python_name], text=True, env=env).rstrip('\n')
+                    else:
+                        python_executable = ytdl_python
+                    pythonLibs = subprocess.check_output([python_executable, '-E', '-c',
                                                           'import sys; print(sys.path)'],
                                                           text=True, env=dict())
                     pythonLibs = ast.literal_eval(pythonLibs)
@@ -598,7 +607,7 @@ class MpvPlayer(BasePlayer):
                 except:
                     pythonPath = None
                 if pythonPath is not None:
-                    env['PATH'] = '/usr/bin:/usr/local/bin'
+                    env['PATH'] = python_executable + ':' + env['PATH']
                     env['PYTHONPATH'] = pythonPath
             try:
                 socket = self.mpv_arguments.get('input-ipc-server')
