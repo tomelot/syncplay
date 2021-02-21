@@ -2,6 +2,7 @@ from syncplay.players.basePlayer import BasePlayer
 from syncplay import constants
 from mutagen.mp3 import MP3
 from time import time
+import validators
 import requests
 import os
 
@@ -39,29 +40,29 @@ class HttpPlayer(BasePlayer):
     alertOSDSupported = False
     osdMessageSeparator = ""
 
-    SEND_ADDRESS = "http://127.0.0.1:5000/data"
-    DEFAULT_PATH = "/HttpPlayer"
-    DEFAULT_FILE = "want.mp3"
-
     def __init__(self, client, playerPath, filePath, args):
         self._stream = StreamData()
         self._client = client
 
-        self._filepath = filePath if filePath else self.DEFAULT_FILE  # For the audio file
+        self._filepath = filePath  # For the audio file
         self._position = 0.0  # In seconds
         self._speed = 1.0  # Percentage
         self._paused = False
         self._done = False
         self._last_send = time()
+        self._address = playerPath  # Used as address
+        
+        print("init http player")
 
-        try:
-            self.openFile(self._filepath)
-            self._client.updateFile(os.path.basename(self._filepath), MP3(
-                self._filepath).info.length, self._filepath)
-            self.setPaused(True)
-            self.setPosition(0.0)
-        except Exception as e:
-            print(e)
+        if self._filepath:
+            try:
+                self.openFile(self._filepath)
+                self._client.updateFile(os.path.basename(self._filepath), MP3(
+                    self._filepath).info.length, self._filepath)
+                self.setPaused(True)
+                self.setPosition(0.0)
+            except Exception as e:
+                print(e)
 
         self._client.initPlayer(self)
 
@@ -71,7 +72,7 @@ class HttpPlayer(BasePlayer):
 
     def streamUpdate(self):
         self._stream.sendto(self._position, self._speed,
-                            self._paused, self.SEND_ADDRESS)
+                            self._paused, self._address)
 
     '''
     This method is supposed to
@@ -170,8 +171,8 @@ class HttpPlayer(BasePlayer):
     '''
     @ staticmethod
     def isValidPlayerPath(path):
-        # Always true because it's really a player
-        return path == HttpPlayer.DEFAULT_PATH
+        # True if a valid http url
+        return validators.url(path)
 
     '''
     @type path: string
