@@ -171,7 +171,7 @@ class HttpPlayer(BasePlayer):
     @ staticmethod
     def isValidPlayerPath(path):
         # Always true because it's really a player
-        return path == HTTPPlayer.DEFAULT_PATH
+        return path == HttpPlayer.DEFAULT_PATH
 
     '''
     @type path: string
