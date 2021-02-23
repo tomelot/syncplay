@@ -34,6 +34,7 @@ class StreamData():
 
 
 class HttpPlayer(BasePlayer):
+    MINIMUM_PUSH_TIME = 1
     speedSupported = True
     customOpenDialog = False
     chatOSDSupported = False
@@ -83,7 +84,7 @@ class HttpPlayer(BasePlayer):
     def askForStatus(self):
         if not self._client.userlist.currentUser.ready:
             self._client.toggleReady()
-        if time() - self._last_send >= 5:
+        if time() - self._last_send >= self.MINIMUM_PUSH_TIME:
             self._position = self._client.getGlobalPosition()
             self._paused = self._client.getGlobalPaused()
             self.streamUpdate()
